@@ -1,7 +1,9 @@
+import pygame
 import cv2
 import threading
 import simpleaudio as sa
 import time
+import wave
 import socket
 from PIL import Image
 
@@ -26,24 +28,26 @@ exit_event = threading.Event()
 # ------------------------------------------
 # FONCTION: lecture audio dans un thread
 # ------------------------------------------
+
 def play_audio(wav_path):
-    """
-    Lit le fichier WAV en bloc (bloquant) mais on peut le stopper
-    en testant exit_event avant chaque portion.
-    """
     try:
-        wave_obj = sa.WaveObject.from_wave_file(wav_path)
-        play_obj = wave_obj.play()
-        # Tant que le son n'est pas fini, on boucle en vérifiant exit_event
-        while play_obj.is_playing():
-            if exit_event.is_set():
-                play_obj.stop()
-                return
+        pygame.mixer.init()
+        pygame.mixer.music.load(wav_path)
+        pygame.mixer.music.play()
+
+        while not exit_event.is_set():
+            if paused_event.is_set():
+                pygame.mixer.music.pause()
+                while paused_event.is_set() and not exit_event.is_set():
+                    time.sleep(0.1)
+                pygame.mixer.music.unpause()
             time.sleep(0.1)
+
+        pygame.mixer.music.stop()
+        pygame.mixer.quit()
+
     except Exception as e:
-        print("Erreur audio :", e)
-
-
+        print("Erreur audio (pygame):", e)
 # ------------------------------------------
 # FONCTION: lecture vidéo en plein écran
 # ------------------------------------------
