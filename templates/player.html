@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head><title>Lecteur</title></head>
+<body style="margin:0">
+    <video id="video" controls style="width: 100%; height: 100vh; object-fit: contain;">
+        <source src="{{ url_for('static', filename='long.mp4') }}" type="video/mp4">
+        Votre navigateur ne supporte pas la lecture de cette vidéo.
+    </video>
+
+    <script>
+    const video = document.getElementById("video");
+    let lastAction = null;
+
+    async function checkState() {
+        try {
+            const res = await fetch("/state");
+            const data = await res.json();
+
+            // Play/Pause
+            if (data.action !== lastAction) {
+                lastAction = data.action;
+                if (data.action === "play") {
+                    const playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(e => {
+                            console.warn("Erreur lecture vidéo:", e);
+                        });
+                    }
+                } else if (data.action === "pause") {
+                    video.pause();
+                }
+            }
+
+            // Seek accumulé
+            if (data.seek !== 0) {
+                let newTime = video.currentTime + data.seek;
+                if (newTime < 0) newTime = 0;
+                if (newTime > video.duration) newTime = video.duration;
+                video.currentTime = newTime;
+
+                // Reset seek côté serveur
+                await fetch("/command", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: "action=seek_done"
+                });
+            }
+        } catch (e) {
+            console.error("Erreur fetch /state:", e);
+        }
+    }
+
+    window.onload = () => {
+        setInterval(checkState, 1000);
+    };
+</script>
+
+    <button onclick="video.play()">Play manuel</button>
+    <button onclick="video.pause()">Pause manuel</button>
+</body>
+</html>

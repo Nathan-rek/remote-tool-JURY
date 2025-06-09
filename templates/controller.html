@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><title>Controller</title></head>
+<body>
+    <h1>Contrôle distant</h1>
+    <button onclick="sendCommand('play')">Lecture</button>
+    <button onclick="sendCommand('pause')">Pause</button>
+    <button onclick="sendCommand('rewind')">-15 secondes</button>
+    <button onclick="sendCommand('forward')">+15 secondes</button>
+
+    <script>
+        function sendCommand(action) {
+            fetch("/command", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `action=${action}`
+            });
+        }
+    </script>
+</body>
+</html>
+s
