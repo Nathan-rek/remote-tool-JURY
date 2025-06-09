@@ -5,3 +5,4 @@ frames
 venv
 /venv
 /static/long.mp4
+__pycache__
