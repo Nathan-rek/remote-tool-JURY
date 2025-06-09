@@ -23,6 +23,7 @@ video_state = {
     "seek": 0           # secondes à sauter, peut être positif ou négatif
 }
 
+
 @app.route("/")
 def controller():
     return render_template("controller.html")
