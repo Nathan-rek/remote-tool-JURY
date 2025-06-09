@@ -10,7 +10,7 @@
 
     <script>
         function sendCommand(action) {
-            fetch("/command", {
+            fetch("{{ url_for('command') }}", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: `action=${action}`
@@ -19,4 +19,3 @@
     </script>
 </body>
 </html>
-s

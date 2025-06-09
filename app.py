@@ -1,6 +1,22 @@
 from flask import Flask, render_template, request, jsonify
+from flask_flatpages import FlatPages
+import os
 
 app = Flask(__name__)
+app.config['APPLICATION_ROOT'] = '/remote-jury'
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+FLATPAGES_MARKDOWN_EXTENSIONS = ['extra']
+FLATPAGES_EXTENSION_CONFIGS = {
+    'codehilite': {
+        'linenums': 'True'
+    }
+}
+
+app.config.from_object(__name__)
+pages = FlatPages(app)
+application = app
+pages.get('foo')
 
 video_state = {
     "action": "pause",  # play/pause/none
@@ -33,4 +49,4 @@ def state():
     return jsonify(video_state)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
